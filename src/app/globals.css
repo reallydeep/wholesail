@@ -1,26 +1,473 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   WHOLESAIL — Ledger Theme
+   Forest green · bone cream · brass · ink
+   Inspired by old-money real-estate ledger books
+   ============================================================ */
+
+@theme {
+  /* ---------- primitives ---------- */
+  --color-bone: #f5f1e8;         /* page background */
+  --color-bone-deep: #ece6d6;    /* raised surface */
+  --color-parchment: #faf7ee;    /* card */
+
+  --color-forest-50: #eef3ef;
+  --color-forest-100: #d4e0d6;
+  --color-forest-200: #a9c1ae;
+  --color-forest-300: #7ca286;
+  --color-forest-400: #4e7f5d;
+  --color-forest-500: #2f5e42;
+  --color-forest-600: #244a33;   /* primary action */
+  --color-forest-700: #1a3a2a;
+  --color-forest-800: #122c1f;
+  --color-forest-900: #0a1a12;
+
+  --color-brass-50: #faf3e4;
+  --color-brass-100: #f0e2bf;
+  --color-brass-300: #d6b877;
+  --color-brass-500: #b08d57;    /* accent */
+  --color-brass-700: #8a6a3d;
+
+  --color-clay-500: #b8563a;     /* warning/alert warm */
+  --color-clay-600: #9c4027;
+
+  --color-ink: #1a1f1a;          /* body text */
+  --color-ink-soft: #4a5248;     /* secondary text */
+  --color-ink-faint: #8a8e82;    /* tertiary text */
+
+  --color-rule: #d9d2bf;         /* hairlines */
+  --color-rule-strong: #a89e82;
+
+  --color-surface: #faf7ee;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunk: #ece6d6;
+
+  /* ---------- semantic ---------- */
+  --color-background: var(--color-bone);
+  --color-foreground: var(--color-ink);
+  --color-primary: var(--color-forest-700);
+  --color-primary-fg: var(--color-bone);
+  --color-accent: var(--color-brass-500);
+  --color-danger: var(--color-clay-600);
+
+  /* success / warn / error (paired with icons, never color alone) */
+  --color-state-pursue: var(--color-forest-600);
+  --color-state-review: var(--color-brass-500);
+  --color-state-pass: var(--color-clay-600);
+
+  /* ---------- typography ---------- */
+  --font-display: var(--font-fraunces), "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---------- radii ---------- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+
+  /* ---------- shadows ---------- */
+  --shadow-card: 0 1px 0 rgba(26,31,26,0.04), 0 4px 12px -4px rgba(26,31,26,0.06);
+  --shadow-raised: 0 1px 0 rgba(26,31,26,0.04), 0 8px 24px -8px rgba(26,31,26,0.10);
+  --shadow-focus: 0 0 0 2px var(--color-bone), 0 0 0 4px var(--color-forest-600);
+
+  /* ---------- motion ---------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft: cubic-bezier(0.64, 0, 0.78, 0);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================================
+   BASE
+   ============================================================ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  background: var(--color-bone);
+  color: var(--color-ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* editorial display type — used sparingly */
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* prevent orphan words on long paragraphs */
+p, dd, li { text-wrap: pretty; }
+
+/* skip-to-content link — keyboard a11y */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 1rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--color-forest-700);
+  color: var(--color-bone);
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  z-index: 100;
+  transition: top 160ms var(--ease-out-soft);
+}
+.skip-link:focus-visible { top: 0.5rem; }
+
+/* ============================================================
+   TEXTURE — subtle paper grain on body
+   ============================================================ */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+body > * { position: relative; z-index: 1; }
+
+/* ============================================================
+   Decorative — rule/divider accents
+   ============================================================ */
+
+.rule-ornament::before,
+.rule-ornament::after {
+  content: "";
+  display: inline-block;
+  height: 1px;
+  background: var(--color-rule-strong);
+  vertical-align: middle;
+  width: 2rem;
+  margin: 0 0.75rem;
+}
+
+.deco-diamond::before {
+  content: "◆";
+  color: var(--color-brass-500);
+  font-size: 0.7em;
+  margin-right: 0.5em;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   Focus ring
+   ============================================================ */
+
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes stamp {
+  0%   { opacity: 0; transform: scale(1.4) rotate(-6deg); }
+  60%  { opacity: 1; transform: scale(0.95) rotate(-2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-rise { animation: rise-in 0.6s var(--ease-out-soft) both; }
+.animate-fade { animation: fade-in 0.6s var(--ease-out-soft) both; }
+.animate-stamp { animation: stamp 0.5s var(--ease-out-soft) both; }
+
+/* ============================================================
+   CINEMATIC HERO (route: /) — dark, video-bg, liquid-glass CTAs
+   Scoped to [data-theme="cinematic"] so it doesn't bleed into
+   the Wholesail ledger light theme used everywhere else.
+   ============================================================ */
+
+[data-theme="cinematic"] {
+  --background: 201 100% 13%;
+  --foreground: 0 0% 100%;
+  --muted-foreground: 240 4% 66%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 4%;
+  --border: 0 0% 18%;
+  --font-instrument: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-inter-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-inter), var(--font-inter-body);
+}
+
+/* suppress the light-theme paper grain on cinematic pages */
+body:has([data-theme="cinematic"])::before { display: none; }
+body:has([data-theme="cinematic"]) { background: hsl(201 100% 13%); }
+
+[data-theme="cinematic"] .font-instrument {
+  font-family: var(--font-instrument), ui-serif, Georgia, serif;
+}
+
+[data-theme="cinematic"] .text-muted-fg {
+  color: hsl(var(--muted-foreground));
+}
+
+/* liquid glass — per-spec */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 280ms var(--ease-out-soft);
+}
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* cinematic hero fade-rise stagger */
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-rise         { animation: fade-rise 0.8s ease-out both; }
+.animate-fade-rise-delay   { animation: fade-rise 0.8s ease-out 0.2s both; }
+.animate-fade-rise-delay-2 { animation: fade-rise 0.8s ease-out 0.4s both; }
+.animate-fade-rise-delay-3 { animation: fade-rise 0.8s ease-out 0.6s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   PRINT / PDF document styles
+   Used at /print/[docType] — browser "Save as PDF"
+   ============================================================ */
+
+.doc {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 72px 72px 96px;
+  background: #fff;
+  color: #1a1f1a;
+  font-family: "Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 11.5pt;
+  line-height: 1.65;
+}
+
+body:has(.doc) { background: #eae4d4; }
+body:has(.doc)::before { display: none; }
+
+.doc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+  border-bottom: 2px solid #1a3a2a;
+}
+
+.doc-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.doc-brand-mark { color: #b08d57; font-size: 10pt; }
+.doc-brand-name {
+  font-family: var(--font-display);
+  font-size: 13pt;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  color: #1a3a2a;
+}
+
+.doc-meta {
+  display: flex;
+  gap: 18px;
+  font-size: 8pt;
+  color: #4a5248;
+}
+.doc-meta > div { display: flex; flex-direction: column; gap: 2px; text-align: right; }
+.doc-meta-label {
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #8a8e82;
+}
+.doc-meta-val {
+  font-family: var(--font-mono);
+  color: #1a1f1a;
+  font-size: 9pt;
+  font-variant-numeric: tabular-nums;
+}
+
+.doc-title { margin: 0 0 36px; }
+.doc-title-overline {
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #8a6a3d;
+  margin-bottom: 8px;
+}
+.doc-title h1 {
+  font-family: var(--font-display);
+  font-size: 32pt;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  color: #0a1a12;
+  margin: 0;
+}
+
+.doc-body { }
+.doc-h {
+  font-family: var(--font-display);
+  font-size: 12pt;
+  font-weight: 600;
+  color: #1a3a2a;
+  margin: 28px 0 10px;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+.doc-p { margin: 0 0 12px; text-align: justify; hyphens: auto; }
+.doc-p strong { font-weight: 700; color: #0a1a12; }
+.doc-quote {
+  margin: 14px 0 14px 0;
+  padding: 10px 16px;
+  border-left: 3px solid #b08d57;
+  background: #faf7ee;
+  font-style: italic;
+  color: #4a5248;
+}
+.doc-hr {
+  border: 0;
+  border-top: 1px dashed #a89e82;
+  margin: 24px 0;
+}
+
+.doc-footer {
+  margin-top: 48px;
+  padding-top: 18px;
+  border-top: 1px solid #d9d2bf;
+}
+.doc-disclaimer {
+  background: #faf3e4;
+  border: 1px solid #f0e2bf;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+.doc-disclaimer-label {
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #8a6a3d;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.doc-disclaimer p { margin: 0; font-size: 9pt; line-height: 1.5; color: #4a5248; font-style: italic; }
+.doc-footer-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8pt;
+  color: #8a8e82;
+  font-family: var(--font-mono);
+}
+
+.doc-actions {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #1a3a2a;
+  color: #f5f1e8;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+  z-index: 50;
+}
+.doc-actions button {
+  background: #b08d57;
+  color: #1a1f1a;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+.doc-actions a {
+  color: #f5f1e8;
+  font-size: 11px;
+  text-decoration: none;
+  padding: 0 8px;
+}
+
+@page {
+  size: letter;
+  margin: 0.75in;
+}
+
+@media print {
+  body { background: #fff !important; }
+  body::before { display: none !important; }
+  .no-print, .doc-actions { display: none !important; }
+  .doc {
+    padding: 0;
+    max-width: none;
+    box-shadow: none;
+  }
+  .doc-h { page-break-after: avoid; }
+  .doc-quote { page-break-inside: avoid; }
+  .doc-footer { page-break-inside: avoid; }
+  /* Page numbers via CSS counter (printed header/footer handled by browser) */
+  .doc-pnum::after { content: counter(page); }
+}
+
