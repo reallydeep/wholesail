@@ -199,6 +199,62 @@ body > * { position: relative; z-index: 1; }
 .animate-fade { animation: fade-in 0.6s var(--ease-out-soft) both; }
 .animate-stamp { animation: stamp 0.5s var(--ease-out-soft) both; }
 
+/* analysis engine motion */
+@keyframes scan-sweep {
+  0%   { transform: translateX(-100%); opacity: 0.0; }
+  40%  { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0.0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50%      { opacity: 1;   transform: scale(1); }
+}
+@keyframes shimmer-bar {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes meter-fill {
+  from { width: 0%; }
+}
+@keyframes tick-in {
+  from { opacity: 0; transform: scale(0.6); }
+  70%  { opacity: 1; transform: scale(1.15); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.scan-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(176, 141, 87, 0.0) 40%,
+    rgba(176, 141, 87, 0.5) 50%,
+    rgba(176, 141, 87, 0.0) 60%,
+    transparent 100%
+  );
+  animation: scan-sweep 1.8s linear infinite;
+  pointer-events: none;
+}
+.shimmer-bar {
+  background: linear-gradient(
+    90deg,
+    rgba(26, 31, 26, 0.08) 0%,
+    rgba(176, 141, 87, 0.35) 50%,
+    rgba(26, 31, 26, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-bar 1.6s linear infinite;
+}
+.stagger-in-1 { animation: rise-in 0.5s var(--ease-out-soft) 0.08s both; }
+.stagger-in-2 { animation: rise-in 0.5s var(--ease-out-soft) 0.16s both; }
+.stagger-in-3 { animation: rise-in 0.5s var(--ease-out-soft) 0.24s both; }
+.stagger-in-4 { animation: rise-in 0.5s var(--ease-out-soft) 0.32s both; }
+.stagger-in-5 { animation: rise-in 0.5s var(--ease-out-soft) 0.40s both; }
+.stagger-in-6 { animation: rise-in 0.5s var(--ease-out-soft) 0.48s both; }
+.animate-tick-in { animation: tick-in 0.5s var(--ease-out-soft) both; }
+.animate-pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+
 /* ============================================================
    CINEMATIC HERO (route: /) — dark, video-bg, liquid-glass CTAs
    Scoped to [data-theme="cinematic"] so it doesn't bleed into

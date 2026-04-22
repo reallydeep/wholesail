@@ -4,6 +4,7 @@ import * as React from "react";
 import type { AnalysisResult } from "@/lib/analysis/types";
 import type { ComplianceDecision } from "@/lib/compliance/types";
 import type { DealDraft } from "@/app/app/deals/new/_lib/types";
+import type { AiAnalysisNarrative, AiDocDraft, AiDocKind } from "@/lib/ai/types";
 
 export type DealStatus = "prospect" | "contract" | "closed";
 
@@ -16,6 +17,8 @@ export interface SavedDeal {
   analysis?: AnalysisResult;
   compliance?: ComplianceDecision;
   notes?: string;
+  aiNarrative?: AiAnalysisNarrative;
+  aiDocs?: Partial<Record<AiDocKind, AiDocDraft>>;
 }
 
 const KEY = "wholesail:deals:v1";
@@ -61,6 +64,7 @@ export function useDeals(): {
   updateStatus: (id: string, status: DealStatus) => void;
   remove: (id: string) => void;
   get: (id: string) => SavedDeal | undefined;
+  patch: (id: string, fields: Partial<SavedDeal>) => void;
 } {
   const raw = React.useSyncExternalStore(subscribe, snapshot, () => "[]");
   const deals = React.useMemo<SavedDeal[]>(() => {
@@ -85,6 +89,8 @@ export function useDeals(): {
         analysis: deal.analysis,
         compliance: deal.compliance,
         notes: deal.notes ?? existing?.notes,
+        aiNarrative: deal.aiNarrative ?? existing?.aiNarrative,
+        aiDocs: deal.aiDocs ?? existing?.aiDocs,
       };
       const filtered = deals.filter((d) => d.id !== next.id);
       write([next, ...filtered]);
@@ -115,7 +121,17 @@ export function useDeals(): {
     [deals],
   );
 
-  return { deals, save, updateStatus, remove, get };
+  const patch = React.useCallback(
+    (id: string, fields: Partial<SavedDeal>) => {
+      const updated = deals.map((d) =>
+        d.id === id ? { ...d, ...fields, updatedAt: new Date().toISOString() } : d,
+      );
+      write(updated);
+    },
+    [deals],
+  );
+
+  return { deals, save, updateStatus, remove, get, patch };
 }
 
 export function readDealsSync(): SavedDeal[] {

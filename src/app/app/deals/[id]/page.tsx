@@ -11,6 +11,8 @@ import { SUPPORTED_STATES } from "@/lib/compliance";
 import { renderDocument } from "@/lib/templates/render";
 import type { DocType, DocumentVariables } from "@/lib/templates/types";
 import { formatCurrency, cn } from "@/lib/utils";
+import { AiNarrativeSection } from "./_components/ai-narrative-section";
+import { AiDocsSection } from "./_components/ai-docs-section";
 
 type Tab = "analysis" | "documents" | "activity";
 
@@ -207,6 +209,8 @@ function AnalysisTab({ deal }: { deal: SavedDeal }) {
 
   return (
     <div className="grid gap-6">
+      <AiNarrativeSection deal={deal} />
+
       <div className="grid md:grid-cols-4 gap-3">
         <StatCard
           label="Decision"
@@ -434,7 +438,13 @@ function DocumentsTab({ deal }: { deal: SavedDeal }) {
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-6">
+      <AiDocsSection deal={deal} />
+
+      <div className="grid gap-4">
+        <div className="text-[10px] uppercase tracking-[0.18em] text-brass-700 font-mono font-medium">
+          Starter templates
+        </div>
       <div className="flex flex-wrap gap-2 items-center">
         {DOC_CATALOG.map((doc) => {
           const active = selected === doc.type;
@@ -505,6 +515,7 @@ function DocumentsTab({ deal }: { deal: SavedDeal }) {
             Could not render this document.
           </div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -185,6 +185,7 @@ export default function NewDealPage() {
             )}
             {step === "analyze" && (
               <StepAnalyze
+                draft={draft}
                 analysis={analysis}
                 compliance={compliance}
                 error={analysisError}
