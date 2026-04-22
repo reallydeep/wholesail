@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" role="img" aria-label="Wholesail — Lock the handshake. Your attorney takes it home.">
+  <title>Wholesail</title>
+  <desc>Lock the handshake. Your attorney takes it home. A tool for wholesale, fix-and-flip, and buy-and-hold real estate dealmakers.</desc>
+
+  <defs>
+    <!-- layered dark navy gradient, cinematic -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#00395a"/>
+      <stop offset="55%" stop-color="#001d34"/>
+      <stop offset="100%" stop-color="#00111f"/>
+    </linearGradient>
+
+    <!-- warm brass spotlight, upper-left -->
+    <radialGradient id="spotlight" cx="22%" cy="18%" r="55%">
+      <stop offset="0%"   stop-color="#d6b877" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#d6b877" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- thin editorial grid -->
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0 H0 V80" fill="none" stroke="#ffffff" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+
+    <!-- subtle noise via SVG turbulence -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0"/>
+    </filter>
+  </defs>
+
+  <!-- stacked layers: base · grid · spotlight · grain -->
+  <rect width="1280" height="400" fill="url(#bg)"/>
+  <rect width="1280" height="400" fill="url(#grid)"/>
+  <rect width="1280" height="400" fill="url(#spotlight)"/>
+  <rect width="1280" height="400" filter="url(#grain)"/>
+
+  <!-- top rule + overlines -->
+  <line x1="80" y1="64" x2="1200" y2="64" stroke="#b08d57" stroke-opacity="0.30" stroke-width="1"/>
+  <text x="80"  y="94" font-family="ui-monospace,'SF Mono',Menlo,monospace" font-size="11" fill="#d6b877" letter-spacing="6">WS · 2026 · BETA</text>
+  <text x="1200" y="94" font-family="ui-monospace,'SF Mono',Menlo,monospace" font-size="11" fill="#d6b877" letter-spacing="6" text-anchor="end">OH · PA · FL</text>
+
+  <!-- decorative diamond mark -->
+  <g transform="translate(80, 160)">
+    <polygon points="0,-18 18,0 0,18 -18,0" fill="none" stroke="#d6b877" stroke-width="1.2" opacity="0.9"/>
+    <polygon points="0,-8 8,0 0,8 -8,0" fill="#d6b877" opacity="0.9"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="130" y="215"
+        font-family="Georgia,'Times New Roman',serif"
+        font-size="104"
+        fill="#ffffff"
+        letter-spacing="-4"
+        font-weight="400">Wholesail<tspan font-size="28" dy="-56" fill="#d6b877">®</tspan></text>
+
+  <!-- italic tagline -->
+  <text x="130" y="270"
+        font-family="Georgia,'Times New Roman',serif"
+        font-style="italic"
+        font-size="30"
+        fill="#ffffff"
+        opacity="0.78">Lock the handshake. <tspan fill="#d6b877" opacity="1">Your attorney takes it home.</tspan></text>
+
+  <!-- bottom rule + meta strip -->
+  <line x1="80" y1="330" x2="1200" y2="330" stroke="#b08d57" stroke-opacity="0.30" stroke-width="1"/>
+  <text x="80"  y="358"
+        font-family="ui-monospace,'SF Mono',Menlo,monospace"
+        font-size="11"
+        fill="#b08d57"
+        letter-spacing="5">A TOOL FOR DEALMAKERS · WHOLESALE · FIX &amp; FLIP · BUY &amp; HOLD</text>
+  <text x="1200" y="358"
+        font-family="ui-monospace,'SF Mono',Menlo,monospace"
+        font-size="11"
+        fill="#b08d57"
+        letter-spacing="5"
+        text-anchor="end">NOT LEGAL ADVICE</text>
+
+  <!-- decorative right-side diamonds echo -->
+  <g transform="translate(1060, 150)" opacity="0.22">
+    <polygon points="0,0 22,22 0,44 -22,22" fill="none" stroke="#d6b877" stroke-width="1"/>
+    <polygon points="52,22 74,44 52,66 30,44" fill="none" stroke="#d6b877" stroke-width="1"/>
+    <polygon points="104,0 126,22 104,44 82,22" fill="none" stroke="#d6b877" stroke-width="1"/>
+    <polygon points="156,22 178,44 156,66 134,44" fill="none" stroke="#d6b877" stroke-width="1"/>
+  </g>
+</svg>
