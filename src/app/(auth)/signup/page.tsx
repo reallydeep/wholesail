@@ -2,20 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   AuthCard,
   AuthField,
   AuthSubmit,
   AuthError,
 } from "../_components/auth-card";
-import { signUp, type Session } from "@/lib/auth/session";
-
-const PLAN_LABELS: Record<Session["plan"], string> = {
-  beta: "Beta · Free",
-  operator: "Operator · Waitlist",
-  desk: "Desk · Invite only",
-};
+import { StatePicker } from "./_components/state-picker";
+import type { StateCode } from "@/lib/compliance/types";
 
 export default function SignUpPage() {
   return (
@@ -27,10 +22,7 @@ export default function SignUpPage() {
 
 function SignUpForm() {
   const router = useRouter();
-  const params = useSearchParams();
-  const requestedPlan = (params?.get("plan") ?? "beta") as Session["plan"];
-  const plan: Session["plan"] = requestedPlan in PLAN_LABELS ? requestedPlan : "beta";
-
+  const [states, setStates] = React.useState<StateCode[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
 
@@ -38,24 +30,45 @@ function SignUpForm() {
     e.preventDefault();
     if (pending) return;
     setError(null);
+
     const form = new FormData(e.currentTarget);
-    const name = String(form.get("name") ?? "");
-    const email = String(form.get("email") ?? "");
+    const displayName = String(form.get("name") ?? "").trim();
+    const firmName = String(form.get("firmName") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
 
-    setPending(true);
-    const res = await signUp({ name, email, password, plan });
-    setPending(false);
-    if (!res.ok) {
-      setError(res.error);
+    if (states.length === 0) {
+      setError("Pick at least one state.");
       return;
     }
-    router.push("/app");
+
+    setPending(true);
+    try {
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName, firmName, email, password, states }),
+      });
+      if (res.status === 202) {
+        router.push("/waitlist?state=" + encodeURIComponent(states.join(",")));
+        return;
+      }
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error ?? `signup failed: ${res.status}`);
+      }
+      router.push("/app");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "signup failed");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
     <AuthCard
-      overline="New account"
+      overline="Start your trial"
       title={
         <>
           Put your next deal{" "}
@@ -64,10 +77,8 @@ function SignUpForm() {
       }
       subtitle={
         <>
-          You&rsquo;re joining <strong className="text-white/80">{PLAN_LABELS[plan]}</strong>.
-          {plan === "beta"
-            ? " No card needed — you're in the first cohort."
-            : " We'll notify you the moment this tier opens."}
+          7-day trial. Card required on day 8. Pick every state your team closes
+          deals in — we&rsquo;ll waitlist any we don&rsquo;t support yet.
         </>
       }
       footer={
@@ -79,7 +90,7 @@ function SignUpForm() {
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <AuthField
           label="Your name"
           name="name"
@@ -88,7 +99,14 @@ function SignUpForm() {
           required
         />
         <AuthField
-          label="Email"
+          label="Firm name"
+          name="firmName"
+          autoComplete="organization"
+          placeholder="Morgan Acquisitions LLC"
+          required
+        />
+        <AuthField
+          label="Work email"
           type="email"
           name="email"
           autoComplete="email"
@@ -105,10 +123,10 @@ function SignUpForm() {
           required
         />
 
-        <input type="hidden" name="plan" value={plan} />
+        <StatePicker value={states} onChange={setStates} />
 
         <div className="pt-2">
-          <AuthSubmit label="Create account" pending={pending} />
+          <AuthSubmit label="Start 7-day trial" pending={pending} />
         </div>
 
         <AuthError error={error} />
@@ -122,7 +140,7 @@ function SignUpForm() {
           <Link href="/privacy" className="underline-offset-2 hover:underline">
             privacy policy
           </Link>
-          . Wholesail is a software tool, not a law firm.
+          . Wholesail is a software tool, not a law firm or brokerage.
         </p>
       </form>
     </AuthCard>

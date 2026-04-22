@@ -2,17 +2,27 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AuthCard,
   AuthField,
   AuthSubmit,
   AuthError,
 } from "../_components/auth-card";
-import { signIn } from "@/lib/auth/session";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 
 export default function SignInPage() {
+  return (
+    <React.Suspense fallback={<div className="text-white/50 text-sm">Loading…</div>}>
+      <SignInForm />
+    </React.Suspense>
+  );
+}
+
+function SignInForm() {
   const router = useRouter();
+  const sp = useSearchParams();
+  const next = sp.get("next") ?? "/app";
   const [error, setError] = React.useState<string | null>(null);
   const [pending, setPending] = React.useState(false);
 
@@ -20,17 +30,21 @@ export default function SignInPage() {
     e.preventDefault();
     if (pending) return;
     setError(null);
+
     const form = new FormData(e.currentTarget);
-    const email = String(form.get("email") ?? "");
+    const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
+
     setPending(true);
-    const res = await signIn({ email, password });
+    const sb = supabaseBrowser();
+    const { error: err } = await sb.auth.signInWithPassword({ email, password });
     setPending(false);
-    if (!res.ok) {
-      setError(res.error);
+    if (err) {
+      setError(err.message);
       return;
     }
-    router.push("/app");
+    router.push(next);
+    router.refresh();
   }
 
   return (
