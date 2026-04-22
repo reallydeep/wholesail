@@ -1,6 +1,6 @@
 import { ALL_OH } from "./rules/oh";
-import { ALL_PA } from "./rules/pa";
 import { ALL_FL } from "./rules/fl";
+import { ALL_GREEN } from "./rules/green";
 import type {
   ComplianceDecision,
   ComplianceWarning,
@@ -9,12 +9,24 @@ import type {
   Strategy,
 } from "./types";
 
-const ALL_RULES: StateRuleSet[] = [...ALL_OH, ...ALL_PA, ...ALL_FL];
+const ALL_RULES: StateRuleSet[] = [...ALL_GREEN, ...ALL_OH, ...ALL_FL];
 
-export const SUPPORTED_STATES: { code: StateCode; name: string }[] = [
-  { code: "OH", name: "Ohio" },
-  { code: "PA", name: "Pennsylvania" },
-  { code: "FL", name: "Florida" },
+export const SUPPORTED_STATES: { code: StateCode; name: string; tier: "green" | "yellow" }[] = [
+  { code: "AL", name: "Alabama",        tier: "green"  },
+  { code: "CO", name: "Colorado",       tier: "green"  },
+  { code: "FL", name: "Florida",        tier: "yellow" },
+  { code: "GA", name: "Georgia",        tier: "green"  },
+  { code: "KS", name: "Kansas",         tier: "green"  },
+  { code: "MI", name: "Michigan",       tier: "green"  },
+  { code: "MO", name: "Missouri",       tier: "green"  },
+  { code: "NC", name: "North Carolina", tier: "green"  },
+  { code: "OH", name: "Ohio",           tier: "yellow" },
+  { code: "SC", name: "South Carolina", tier: "green"  },
+  { code: "TN", name: "Tennessee",      tier: "green"  },
+  { code: "TX", name: "Texas",          tier: "green"  },
+  { code: "VA", name: "Virginia",       tier: "green"  },
+  { code: "WI", name: "Wisconsin",      tier: "green"  },
+  { code: "WV", name: "West Virginia",  tier: "green"  },
 ];
 
 export function resolveRules(

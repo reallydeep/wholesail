@@ -1,4 +1,7 @@
-export type StateCode = "OH" | "PA" | "FL";
+export type StateCode =
+  | "AL" | "CO" | "GA" | "KS" | "MI" | "MO" | "NC" | "SC"
+  | "TN" | "TX" | "VA" | "WI" | "WV"
+  | "OH" | "FL";
 export type Strategy = "wholesale" | "flip" | "hold";
 export type ConfidenceLevel = "high" | "medium" | "low";
 
