@@ -13,6 +13,8 @@ import type { DocType, DocumentVariables } from "@/lib/templates/types";
 import { formatCurrency, cn } from "@/lib/utils";
 import { AiNarrativeSection } from "./_components/ai-narrative-section";
 import { AiDocsSection } from "./_components/ai-docs-section";
+import { ProMathPanel } from "./_components/pro-math-panel";
+import { AiInspectionSection } from "./_components/ai-inspection-section";
 
 type Tab = "analysis" | "documents" | "activity";
 
@@ -209,7 +211,11 @@ function AnalysisTab({ deal }: { deal: SavedDeal }) {
 
   return (
     <div className="grid gap-6">
+      <AiInspectionSection deal={deal} />
+
       <AiNarrativeSection deal={deal} />
+
+      {a.mathV2 && <ProMathPanel result={a.mathV2} />}
 
       <div className="grid md:grid-cols-4 gap-3">
         <StatCard
