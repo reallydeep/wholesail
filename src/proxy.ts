@@ -1,11 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { publicEnv } from "@/lib/env";
+import { publicEnv, useSupabase } from "@/lib/env";
 
 const PROTECTED = ["/app"];
 const AUTH_PAGES = ["/signin", "/signup"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  if (
+    !useSupabase ||
+    !publicEnv.NEXT_PUBLIC_SUPABASE_URL ||
+    !publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -24,7 +32,14 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  let user: { id: string } | null = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    return NextResponse.next({ request });
+  }
+
   const path = request.nextUrl.pathname;
 
   if (!user && PROTECTED.some((p) => path.startsWith(p))) {
