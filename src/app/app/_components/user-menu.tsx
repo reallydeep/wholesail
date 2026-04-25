@@ -3,11 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession, signOut } from "@/lib/auth/session";
+import { useSupabaseSession } from "@/lib/auth/use-supabase-session";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
 
 export function UserMenu() {
-  const session = useSession();
+  const { user, firm, membership, loading } = useSupabaseSession();
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -28,7 +29,11 @@ export function UserMenu() {
     };
   }, [open]);
 
-  if (!session) {
+  if (loading) {
+    return <div className="h-7 w-7 rounded-full bg-rule/40 animate-pulse" />;
+  }
+
+  if (!user) {
     return (
       <Link
         href="/signin"
@@ -39,12 +44,36 @@ export function UserMenu() {
     );
   }
 
-  const initials = session.name
+  const displayName =
+    (user.user_metadata?.display_name as string | undefined) ??
+    user.email ??
+    "Operator";
+  const email = user.email ?? "";
+  const initials = displayName
     .split(/\s+/)
     .map((p) => p[0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
+  const plan = firm?.plan ?? "trialing";
+  const planLabel =
+    plan === "trialing"
+      ? "Trial"
+      : plan === "scout"
+        ? "Scout"
+        : plan === "operator"
+          ? "Operator"
+          : plan === "firm"
+            ? "Firm"
+            : "Canceled";
+
+  async function handleSignOut() {
+    await supabaseBrowser().auth.signOut();
+    setOpen(false);
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <div ref={ref} className="relative">
@@ -61,7 +90,9 @@ export function UserMenu() {
         >
           {initials || "·"}
         </span>
-        <span className="hidden sm:block text-xs text-ink">{session.name.split(/\s+/)[0]}</span>
+        <span className="hidden sm:block text-xs text-ink">
+          {displayName.split(/\s+/)[0]}
+        </span>
         <svg
           width="10"
           height="10"
@@ -91,17 +122,17 @@ export function UserMenu() {
               Signed in as
             </div>
             <div className="text-sm text-ink font-medium truncate">
-              {session.name}
+              {displayName}
             </div>
-            <div className="text-xs text-ink-soft truncate">
-              {session.email}
-            </div>
+            <div className="text-xs text-ink-soft truncate">{email}</div>
+            {firm && (
+              <div className="text-[11px] text-ink-soft mt-1 truncate">
+                {firm.name}
+                {membership?.role ? ` · ${membership.role}` : ""}
+              </div>
+            )}
             <div className="mt-2 text-[10px] uppercase tracking-[0.14em] text-brass-700 font-medium">
-              {session.plan === "beta"
-                ? "Beta · Free"
-                : session.plan === "operator"
-                  ? "Operator"
-                  : "Desk"}
+              {planLabel}
             </div>
           </div>
           <ul className="py-1.5">
@@ -139,11 +170,7 @@ export function UserMenu() {
           <button
             type="button"
             role="menuitem"
-            onClick={() => {
-              signOut();
-              setOpen(false);
-              router.push("/");
-            }}
+            onClick={handleSignOut}
             className="block w-full text-left px-4 py-3 text-sm text-clay-600 border-t border-rule hover:bg-bone-deep transition-colors"
           >
             Sign out

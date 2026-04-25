@@ -3,8 +3,9 @@
 import * as React from "react";
 
 /**
- * Prototype auth — localStorage session. Swap for NextAuth/Clerk before
- * production. Shape kept compatible with a server-session upgrade path.
+ * @deprecated Legacy localStorage auth. Use `@/lib/auth/use-supabase-session`
+ * on client and `@/lib/auth/supabase-session` on server. Kept only to avoid
+ * breaking any lingering import; no runtime callers in current app.
  */
 
 export interface Session {

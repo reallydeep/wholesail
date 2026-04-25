@@ -1,28 +1,59 @@
 "use client";
 import * as React from "react";
+import type { User } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/supabase/browser";
+import type { FirmRow, MembershipRow } from "@/lib/supabase/types";
 
 export interface ClientSession {
-  userId: string;
-  email: string;
+  user: User | null;
+  membership: MembershipRow | null;
+  firm: FirmRow | null;
+  loading: boolean;
 }
 
-export function useSupabaseSession(): ClientSession | null {
-  const [session, setSession] = React.useState<ClientSession | null>(null);
+const EMPTY: ClientSession = {
+  user: null,
+  membership: null,
+  firm: null,
+  loading: true,
+};
+
+export function useSupabaseSession(): ClientSession {
+  const [state, setState] = React.useState<ClientSession>(EMPTY);
 
   React.useEffect(() => {
     const sb = supabaseBrowser();
     let cancelled = false;
 
-    sb.auth.getUser().then(({ data: { user } }) => {
-      if (cancelled || !user) return;
-      setSession({ userId: user.id, email: user.email ?? "" });
-    });
+    async function resolve(user: User | null) {
+      if (!user) {
+        if (!cancelled)
+          setState({ user: null, membership: null, firm: null, loading: false });
+        return;
+      }
+      const { data: membership } = await sb
+        .from("memberships")
+        .select("firm_id, user_id, role, created_at")
+        .eq("user_id", user.id)
+        .maybeSingle<MembershipRow>();
+      if (cancelled) return;
+      if (!membership) {
+        setState({ user, membership: null, firm: null, loading: false });
+        return;
+      }
+      const { data: firm } = await sb
+        .from("firms")
+        .select("*")
+        .eq("id", membership.firm_id)
+        .maybeSingle<FirmRow>();
+      if (cancelled) return;
+      setState({ user, membership, firm: firm ?? null, loading: false });
+    }
+
+    sb.auth.getUser().then(({ data: { user } }) => resolve(user));
 
     const { data: sub } = sb.auth.onAuthStateChange((_event, s) => {
-      setSession(
-        s?.user ? { userId: s.user.id, email: s.user.email ?? "" } : null,
-      );
+      void resolve(s?.user ?? null);
     });
 
     return () => {
@@ -31,5 +62,5 @@ export function useSupabaseSession(): ClientSession | null {
     };
   }, []);
 
-  return session;
+  return state;
 }
