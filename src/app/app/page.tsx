@@ -403,10 +403,10 @@ function DealRow({
             e.preventDefault();
             if (confirm("Remove this deal?")) onRemove();
           }}
-          className="text-[10px] uppercase tracking-[0.14em] px-2 py-1 bg-clay-600 text-bone rounded-[3px] hover:bg-clay-500"
-          title="Remove"
+          className="text-[10px] uppercase tracking-[0.14em] px-2.5 py-1 bg-clay-500 text-bone rounded-[3px] hover:bg-clay-600 transition-colors"
+          title="Remove deal"
         >
-          Del
+          Remove
         </button>
       </div>
     </li>

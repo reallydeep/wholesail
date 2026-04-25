@@ -35,7 +35,7 @@ export function FlCooldownBanner({ unlocksAt }: { unlocksAt: string }) {
           <span className="font-mono tabular-nums">
             {hrs}h {mins}m
           </span>{" "}
-          (until {new Date(unlocksAt).toLocaleString()}). The seller's 3-day
+          (until {new Date(unlocksAt).toLocaleString()}). The seller&apos;s 3-day
           cancellation window must run before sending the contract to a buyer.
         </p>
       )}

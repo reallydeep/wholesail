@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono, Instrument_Serif, Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -47,10 +48,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${fraunces.variable} ${geist.variable} ${geistMono.variable} ${instrument.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bone text-ink selection:bg-brass/30">
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

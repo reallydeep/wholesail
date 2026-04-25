@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    WHOLESAIL — Ledger Theme
    Forest green · bone cream · brass · ink
@@ -86,6 +88,66 @@ html, body {
   background: var(--color-bone);
   color: var(--color-ink);
 }
+
+/* ============================================================
+   DARK MODE — deeper forest + amber accent
+   Activated by `.dark` class on <html> via next-themes
+   ============================================================ */
+
+.dark {
+  --color-bone: #0d1612;
+  --color-bone-deep: #0a110d;
+  --color-parchment: #121e18;
+
+  --color-forest-50: #0f1a14;
+  --color-forest-100: #122218;
+  --color-forest-200: #1a3024;
+  --color-forest-300: #234634;
+  --color-forest-400: #2f5e42;
+  --color-forest-500: #4e7f5d;
+  --color-forest-600: #7ca286;
+  --color-forest-700: #a9c1ae;
+  --color-forest-800: #d4e0d6;
+  --color-forest-900: #eef3ef;
+
+  --color-brass-50: #2a2114;
+  --color-brass-100: #3a2c1a;
+  --color-brass-300: #b08d57;
+  --color-brass-500: #d6b877;
+  --color-brass-700: #f0e2bf;
+
+  --color-clay-500: #d97757;
+  --color-clay-600: #b8563a;
+
+  --color-ink: #e9e4d4;
+  --color-ink-soft: #b8b4a4;
+  --color-ink-faint: #7d7a6f;
+
+  --color-rule: #1f2c24;
+  --color-rule-strong: #2f3f34;
+
+  --color-surface: #121e18;
+  --color-surface-raised: #16241c;
+  --color-surface-sunk: #0a110d;
+
+  --color-background: var(--color-bone);
+  --color-foreground: var(--color-ink);
+  --color-primary: var(--color-forest-500);
+  --color-primary-fg: var(--color-bone);
+  --color-accent: var(--color-brass-500);
+  --color-danger: var(--color-clay-500);
+
+  --color-state-pursue: var(--color-forest-500);
+  --color-state-review: var(--color-brass-500);
+  --color-state-pass: var(--color-clay-500);
+
+  --shadow-card: 0 1px 0 rgba(0,0,0,0.4), 0 4px 12px -4px rgba(0,0,0,0.5);
+  --shadow-raised: 0 1px 0 rgba(0,0,0,0.4), 0 8px 24px -8px rgba(0,0,0,0.6);
+  --shadow-focus: 0 0 0 2px var(--color-bone), 0 0 0 4px var(--color-brass-500);
+}
+
+/* suppress paper grain in dark — it muddies the deep greens */
+.dark body::before { display: none; }
 
 body {
   font-family: var(--font-sans);

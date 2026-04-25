@@ -26,6 +26,8 @@ export interface SavedDeal {
   aiInspection?: DealInspection;
   contractAt?: string;
   disclosuresAck?: DisclosureAck[];
+  lat?: number;
+  lon?: number;
 }
 
 // ─── Legacy localStorage path ────────────────────────────────────────
@@ -75,6 +77,8 @@ interface DealRowWire {
   ai_inspection: DealInspection | null;
   contract_at: string | null;
   disclosures_ack: DisclosureAck[] | null;
+  lat: number | null;
+  lon: number | null;
   snapshot_hash: string | null;
   updated_at: string;
   created_at: string;
@@ -102,6 +106,8 @@ function fromRow(r: DealRowWire): SavedDeal {
     aiInspection: r.ai_inspection ?? undefined,
     contractAt: r.contract_at ?? undefined,
     disclosuresAck: r.disclosures_ack ?? undefined,
+    lat: r.lat ?? undefined,
+    lon: r.lon ?? undefined,
   };
 }
 

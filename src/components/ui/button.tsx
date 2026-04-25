@@ -23,6 +23,8 @@ const button = cva(
           "border border-forest-700 text-forest-700 hover:bg-forest-700 hover:text-bone",
         brass:
           "bg-brass-500 text-ink hover:bg-brass-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_rgba(0,0,0,0.12)]",
+        destructive:
+          "bg-clay-500 text-bone hover:bg-clay-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_1px_0_rgba(0,0,0,0.12)]",
         link: "text-forest-700 underline-offset-4 hover:underline p-0 h-auto",
       },
       size: {

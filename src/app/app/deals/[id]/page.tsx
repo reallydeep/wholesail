@@ -17,6 +17,7 @@ import { ProMathPanel } from "./_components/pro-math-panel";
 import { AiInspectionSection } from "./_components/ai-inspection-section";
 import { DisclosureModal } from "./_components/disclosure-modal";
 import { FlCooldownBanner } from "./_components/fl-cooldown-banner";
+import { DealMap } from "./_components/deal-map";
 import {
   requiresContractDisclosure,
   flCooldownExpiresAt,
@@ -167,7 +168,7 @@ export default function DealDetailPage({
               </Button>
             )}
             <Button
-              variant="ghost"
+              variant="destructive"
               size="md"
               onClick={() => {
                 if (confirm("Remove this deal from the ledger?")) {
@@ -180,6 +181,19 @@ export default function DealDetailPage({
             </Button>
           </div>
         </header>
+
+        {d.propertyAddress && (
+          <div className="mb-6">
+            <DealMap
+              dealId={deal.id}
+              initial={
+                deal.lat != null && deal.lon != null
+                  ? { lat: deal.lat, lon: deal.lon }
+                  : undefined
+              }
+            />
+          </div>
+        )}
 
         {(() => {
           const unlocksAt = flCooldownExpiresAt({
