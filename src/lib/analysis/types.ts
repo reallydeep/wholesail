@@ -1,3 +1,5 @@
+import type { EngineResult } from "@/lib/math";
+
 export type Strategy = "wholesale" | "flip" | "hold";
 export type RepairTier = "low" | "medium" | "high";
 export type DecisionScore = "pursue" | "review" | "pass";
@@ -81,4 +83,5 @@ export interface AnalysisResult {
   flags: Flag[];
   engineVersion: string;
   computedAt: string;
+  mathV2?: EngineResult;
 }

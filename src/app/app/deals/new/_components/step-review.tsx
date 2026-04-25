@@ -239,8 +239,8 @@ export function StepReview({
               variant="ghost"
               size="lg"
               disabled={!rendered || saved}
-              onClick={() => {
-                const deal = save({
+              onClick={async () => {
+                const deal = await save({
                   draft,
                   analysis,
                   compliance,
