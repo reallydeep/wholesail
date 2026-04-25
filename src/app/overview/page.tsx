@@ -81,7 +81,7 @@ export default function LandingPage() {
                 <span className="h-3 w-px bg-rule-strong" />
                 <span>No card required</span>
                 <span className="h-3 w-px bg-rule-strong" />
-                <span>OH · PA · FL live</span>
+                <span>15 states live</span>
               </div>
             </div>
 

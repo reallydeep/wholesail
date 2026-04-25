@@ -100,7 +100,7 @@ export default function CinematicHero() {
           <div className="animate-fade-rise-delay-3 mt-10 flex items-center gap-5 text-xs text-muted-fg uppercase tracking-[0.24em]">
             <span>Free during beta</span>
             <span aria-hidden className="h-3 w-px bg-white/20" />
-            <span>OH · PA · FL</span>
+            <span>15 states</span>
             <span aria-hidden className="h-3 w-px bg-white/20" />
             <span>No card required</span>
           </div>
@@ -262,7 +262,7 @@ const TIERS: Tier[] = [
     ctaLabel: "Begin Journey",
     ctaHref: "/signup",
     features: [
-      "All 3 states (OH, PA, FL)",
+      "All 15 supported states",
       "Wholesale · Flip · Hold analysis",
       "Unlimited deals on the ledger",
       "Starter paperwork (LOI, PSA, Assignment)",
