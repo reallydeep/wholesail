@@ -139,11 +139,20 @@ function useDealsSupabase(): DealsApi {
 
   React.useEffect(() => {
     let cancelled = false;
-    const sb = supabaseBrowser();
+    let sb: ReturnType<typeof supabaseBrowser>;
+    try {
+      sb = supabaseBrowser();
+    } catch {
+      setLoading(false);
+      return;
+    }
 
     async function load() {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        if (!cancelled) setLoading(false);
+        return;
+      }
       const { data: membership } = await sb
         .from("memberships")
         .select("firm_id")

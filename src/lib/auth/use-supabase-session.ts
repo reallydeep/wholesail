@@ -2,6 +2,7 @@
 import * as React from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/supabase/browser";
+import { useSupabase } from "@/lib/env";
 import type { FirmRow, MembershipRow } from "@/lib/supabase/types";
 
 export interface ClientSession {
@@ -18,11 +19,27 @@ const EMPTY: ClientSession = {
   loading: true,
 };
 
+const DISABLED: ClientSession = {
+  user: null,
+  membership: null,
+  firm: null,
+  loading: false,
+};
+
 export function useSupabaseSession(): ClientSession {
-  const [state, setState] = React.useState<ClientSession>(EMPTY);
+  const [state, setState] = React.useState<ClientSession>(
+    useSupabase ? EMPTY : DISABLED,
+  );
 
   React.useEffect(() => {
-    const sb = supabaseBrowser();
+    if (!useSupabase) return;
+    let sb: ReturnType<typeof supabaseBrowser>;
+    try {
+      sb = supabaseBrowser();
+    } catch {
+      setState(DISABLED);
+      return;
+    }
     let cancelled = false;
 
     async function resolve(user: User | null) {
