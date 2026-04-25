@@ -15,6 +15,13 @@ import { AiNarrativeSection } from "./_components/ai-narrative-section";
 import { AiDocsSection } from "./_components/ai-docs-section";
 import { ProMathPanel } from "./_components/pro-math-panel";
 import { AiInspectionSection } from "./_components/ai-inspection-section";
+import { DisclosureModal } from "./_components/disclosure-modal";
+import { FlCooldownBanner } from "./_components/fl-cooldown-banner";
+import {
+  requiresContractDisclosure,
+  flCooldownExpiresAt,
+  type DisclosureCode,
+} from "@/lib/compliance/enforcement";
 
 type Tab = "analysis" | "documents" | "activity";
 
@@ -42,8 +49,10 @@ export default function DealDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { get, updateStatus, remove } = useDeals();
+  const { get, updateStatus, remove, patch } = useDeals();
   const [tab, setTab] = React.useState<Tab>("analysis");
+  const [pendingDisclosure, setPendingDisclosure] =
+    React.useState<DisclosureCode | null>(null);
 
   const deal = get(id);
 
@@ -139,12 +148,20 @@ export default function DealDetailPage({
               <Button
                 variant="primary"
                 size="md"
-                onClick={() =>
-                  updateStatus(
-                    deal.id,
-                    deal.status === "prospect" ? "contract" : "closed",
-                  )
-                }
+                onClick={async () => {
+                  if (deal.status === "prospect") {
+                    const code = requiresContractDisclosure(deal.draft.state);
+                    if (code && !(deal.disclosuresAck ?? []).some((a) => a.code === code)) {
+                      setPendingDisclosure(code);
+                      return;
+                    }
+                    const now = new Date().toISOString();
+                    await patch(deal.id, { contractAt: now });
+                    await updateStatus(deal.id, "contract");
+                  } else {
+                    await updateStatus(deal.id, "closed");
+                  }
+                }}
               >
                 {deal.status === "prospect" ? "Mark under contract" : "Mark closed"}
               </Button>
@@ -163,6 +180,38 @@ export default function DealDetailPage({
             </Button>
           </div>
         </header>
+
+        {(() => {
+          const unlocksAt = flCooldownExpiresAt({
+            state: deal.draft.state,
+            contractAt: deal.contractAt,
+          });
+          return unlocksAt ? (
+            <div className="mb-6">
+              <FlCooldownBanner unlocksAt={unlocksAt} />
+            </div>
+          ) : null;
+        })()}
+
+        {pendingDisclosure && (
+          <DisclosureModal
+            code={pendingDisclosure}
+            onCancel={() => setPendingDisclosure(null)}
+            onAck={async () => {
+              const now = new Date().toISOString();
+              const ack = [
+                ...(deal.disclosuresAck ?? []),
+                { code: pendingDisclosure, at: now },
+              ];
+              await patch(deal.id, {
+                disclosuresAck: ack,
+                contractAt: now,
+              });
+              await updateStatus(deal.id, "contract");
+              setPendingDisclosure(null);
+            }}
+          />
+        )}
 
         <nav
           className="flex items-center gap-1 border-b border-rule mb-8"

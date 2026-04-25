@@ -6,6 +6,7 @@ import type { ComplianceDecision, StateCode } from "@/lib/compliance/types";
 import type { DealDraft } from "@/app/app/deals/new/_lib/types";
 import type { AiAnalysisNarrative, AiDocDraft, AiDocKind } from "@/lib/ai/types";
 import type { DealInspection } from "@/lib/ai/inspector/schema";
+import type { DisclosureAck } from "@/lib/compliance/enforcement";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { useSupabase } from "@/lib/env";
 
@@ -23,6 +24,8 @@ export interface SavedDeal {
   aiNarrative?: AiAnalysisNarrative;
   aiDocs?: Partial<Record<AiDocKind, AiDocDraft>>;
   aiInspection?: DealInspection;
+  contractAt?: string;
+  disclosuresAck?: DisclosureAck[];
 }
 
 // ─── Legacy localStorage path ────────────────────────────────────────
@@ -70,6 +73,8 @@ interface DealRowWire {
   analysis: AnalysisResult | null;
   ai_narrative: AiAnalysisNarrative | null;
   ai_inspection: DealInspection | null;
+  contract_at: string | null;
+  disclosures_ack: DisclosureAck[] | null;
   snapshot_hash: string | null;
   updated_at: string;
   created_at: string;
@@ -95,6 +100,8 @@ function fromRow(r: DealRowWire): SavedDeal {
     aiNarrative: r.ai_narrative ?? undefined,
     aiDocs: r.metadata?.aiDocs,
     aiInspection: r.ai_inspection ?? undefined,
+    contractAt: r.contract_at ?? undefined,
+    disclosuresAck: r.disclosures_ack ?? undefined,
   };
 }
 
@@ -235,6 +242,9 @@ function useDealsSupabase(): DealsApi {
       if ("draft" in fields) row.draft = fields.draft;
       if ("analysis" in fields) row.analysis = fields.analysis ?? null;
       if ("aiNarrative" in fields) row.ai_narrative = fields.aiNarrative ?? null;
+      if ("contractAt" in fields) row.contract_at = fields.contractAt ?? null;
+      if ("disclosuresAck" in fields)
+        row.disclosures_ack = fields.disclosuresAck ?? null;
       // merge-style metadata update — read then write
       if (
         "compliance" in fields ||
