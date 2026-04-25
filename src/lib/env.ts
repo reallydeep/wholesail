@@ -30,4 +30,7 @@ export function serverEnv() {
   });
 }
 
-export const useSupabase = publicEnv.NEXT_PUBLIC_USE_SUPABASE === "true";
+export const useSupabase =
+  publicEnv.NEXT_PUBLIC_USE_SUPABASE === "true" &&
+  publicEnv.NEXT_PUBLIC_SUPABASE_URL.length > 0 &&
+  publicEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY.length > 0;

@@ -7,7 +7,7 @@ import { UserMenu } from "./_components/user-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DealMigrationRunner } from "./_components/deal-migration-runner";
 import { useSupabase } from "@/lib/env";
-import { requireServerSession } from "@/lib/auth/supabase-session";
+import { getServerSession } from "@/lib/auth/supabase-session";
 
 export default async function AppLayout({
   children,
@@ -16,8 +16,12 @@ export default async function AppLayout({
 }) {
   let firmName: string | null = null;
   if (useSupabase) {
-    const session = await requireServerSession();
-    firmName = session.firm.name;
+    try {
+      const session = await getServerSession();
+      firmName = session?.firm.name ?? null;
+    } catch {
+      firmName = null;
+    }
   }
 
   return (
