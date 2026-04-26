@@ -22,6 +22,13 @@ export function HeroReveal() {
       const headline = root.current?.querySelector<HTMLHeadingElement>("[data-hr=headline]");
       if (!headline) return;
 
+      // Synchronously promote inline `opacity:0` (anti-FOUC) to the
+      // destination state. Subsequent `.from()` tweens capture this as
+      // their end value; immediateRender then writes start values back
+      // for the actual animation. Doing this with `tl.set` instead would
+      // capture opacity:0 as destination and the items would never appear.
+      gsap.set("[data-hr]", { autoAlpha: 1 });
+
       const split = new SplitText(headline, {
         type: "words,chars",
         wordsClass: "inline-block overflow-hidden align-baseline",
@@ -32,8 +39,7 @@ export function HeroReveal() {
         defaults: { ease: "power3.out" },
       });
 
-      tl.set("[data-hr]", { autoAlpha: 1 })
-        .from(split.chars, {
+      tl.from(split.chars, {
           yPercent: 110,
           opacity: 0,
           duration: 0.9,
