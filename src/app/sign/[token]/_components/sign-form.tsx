@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { SignaturePad, type SignaturePadHandle } from "@/components/signature-pad";
 import { ESIGN_CONSENT_TEXT, ESIGN_CONSENT_VERSION } from "@/lib/esign/consent";
 
-export function SignForm({
-  token,
-  signerName,
-}: {
+export interface SignFormProps {
   token: string;
   signerName: string;
-}) {
+  compact?: boolean;
+  onSigned?: () => void;
+}
+
+export function SignForm({ token, signerName, compact, onSigned }: SignFormProps) {
   const router = useRouter();
   const padRef = React.useRef<SignaturePadHandle>(null);
   const [typedName, setTypedName] = React.useState(signerName);
@@ -50,6 +51,10 @@ export function SignForm({
         setSubmitting(false);
         return;
       }
+      if (onSigned) {
+        onSigned();
+        return;
+      }
       router.push(`/sign/${encodeURIComponent(token)}/signed`);
     } catch {
       setError("Network error. Please try again.");
@@ -60,15 +65,21 @@ export function SignForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[10px] border border-rule bg-parchment p-6 sm:p-8 grid gap-6"
+      className={
+        compact
+          ? "grid gap-4"
+          : "rounded-[10px] border border-rule bg-parchment p-6 sm:p-8 grid gap-6"
+      }
     >
-      <div>
-        <h2 className="font-display text-2xl text-ink">Add your signature</h2>
-        <p className="text-ink-soft text-sm mt-1">
-          Sign once with your mouse, finger, or stylus. Use the Clear button
-          to start over.
-        </p>
-      </div>
+      {!compact && (
+        <div>
+          <h2 className="font-display text-2xl text-ink">Add your signature</h2>
+          <p className="text-ink-soft text-sm mt-1">
+            Sign once with your mouse, finger, or stylus. Use the Clear button
+            to start over.
+          </p>
+        </div>
+      )}
 
       <div>
         <label className="text-[11px] uppercase tracking-[0.16em] text-brass-700 font-medium block mb-2">
@@ -76,7 +87,7 @@ export function SignForm({
         </label>
         <SignaturePad
           ref={padRef}
-          height={180}
+          height={compact ? 140 : 180}
           onChange={(e) => setEmpty(e)}
         />
         <div className="flex justify-end mt-2">

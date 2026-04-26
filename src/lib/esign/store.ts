@@ -98,6 +98,7 @@ export interface SigningRequestsApi {
   create: (
     input: CreateSigningRequestInput & { firmId?: string },
   ) => Promise<SigningRequest>;
+  refresh: () => Promise<void>;
 }
 
 export function useSigningRequests(dealId: string | null): SigningRequestsApi {
@@ -113,12 +114,11 @@ function useSigningRequestsSupabase(
   const [loading, setLoading] = React.useState(true);
   const [firmId, setFirmId] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
+  const reload = React.useCallback(async () => {
     if (!dealId) {
       setLoading(false);
       return;
     }
-    let cancelled = false;
     let sb: ReturnType<typeof supabaseBrowser>;
     try {
       sb = supabaseBrowser();
@@ -126,36 +126,30 @@ function useSigningRequestsSupabase(
       setLoading(false);
       return;
     }
-
-    async function load() {
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user || cancelled) {
-        setLoading(false);
-        return;
-      }
-      const { data: membership } = await sb
-        .from("memberships")
-        .select("firm_id")
-        .eq("user_id", user.id)
-        .maybeSingle<{ firm_id: string }>();
-      if (cancelled) return;
-      setFirmId(membership?.firm_id ?? null);
-
-      const { data: rows } = await sb
-        .from("signing_requests")
-        .select("*")
-        .eq("deal_id", dealId)
-        .order("created_at", { ascending: false });
-      if (cancelled) return;
-      setRequests(((rows ?? []) as SigningRequestRow[]).map(fromRow));
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) {
       setLoading(false);
+      return;
     }
+    const { data: membership } = await sb
+      .from("memberships")
+      .select("firm_id")
+      .eq("user_id", user.id)
+      .maybeSingle<{ firm_id: string }>();
+    setFirmId(membership?.firm_id ?? null);
 
-    void load();
-    return () => {
-      cancelled = true;
-    };
+    const { data: rows } = await sb
+      .from("signing_requests")
+      .select("*")
+      .eq("deal_id", dealId)
+      .order("created_at", { ascending: false });
+    setRequests(((rows ?? []) as SigningRequestRow[]).map(fromRow));
+    setLoading(false);
   }, [dealId]);
+
+  React.useEffect(() => {
+    void reload();
+  }, [reload]);
 
   const create: SigningRequestsApi["create"] = React.useCallback(
     async (input) => {
@@ -184,7 +178,7 @@ function useSigningRequestsSupabase(
     [firmId],
   );
 
-  return { requests, loading, create };
+  return { requests, loading, create, refresh: reload };
 }
 
 function useSigningRequestsLocal(
@@ -227,7 +221,18 @@ function useSigningRequestsLocal(
     [all],
   );
 
-  return { requests, loading: false, create };
+  return {
+    requests,
+    loading: false,
+    create,
+    refresh: async () => {
+      // Local mode reads directly from localStorage via useSyncExternalStore;
+      // no server fetch needed. The dispatched event re-renders subscribers.
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(LS_EVENT));
+      }
+    },
+  };
 }
 
 // ── Public submit (called from /sign/[token]) ──────────────────────

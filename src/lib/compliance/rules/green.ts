@@ -3,20 +3,15 @@ import type { StateCode, StateRuleSet } from "../types";
 const GREEN_STATES: { code: StateCode; name: string }[] = [
   { code: "AL", name: "Alabama" },
   { code: "CO", name: "Colorado" },
-  { code: "GA", name: "Georgia" },
   { code: "KS", name: "Kansas" },
-  { code: "MI", name: "Michigan" },
   { code: "MO", name: "Missouri" },
-  { code: "NC", name: "North Carolina" },
   { code: "SC", name: "South Carolina" },
-  { code: "TN", name: "Tennessee" },
-  { code: "TX", name: "Texas" },
   { code: "VA", name: "Virginia" },
   { code: "WI", name: "Wisconsin" },
   { code: "WV", name: "West Virginia" },
 ];
 
-const ATTORNEY_AT_CLOSE = new Set<StateCode>(["AL", "GA", "NC", "SC", "WV", "VA"]);
+const ATTORNEY_AT_CLOSE = new Set<StateCode>(["AL", "SC", "WV", "VA"]);
 
 export const ALL_GREEN: StateRuleSet[] = GREEN_STATES.map(({ code, name }) => ({
   stateCode: code,

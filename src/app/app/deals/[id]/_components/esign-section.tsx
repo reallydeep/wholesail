@@ -14,6 +14,7 @@ import {
   type SigningStatus,
 } from "@/lib/esign/types";
 import { cn } from "@/lib/utils";
+import { SignForm } from "@/app/sign/[token]/_components/sign-form";
 
 const DOC_OPTIONS: DocType[] = ["offer-letter", "psa", "assignment"];
 const ROLE_OPTIONS: SignerRole[] = ["seller", "buyer"];
@@ -33,7 +34,7 @@ export function EsignSection({
   dealId: string;
   firmId?: string | null;
 }) {
-  const { requests, loading, create } = useSigningRequests(dealId);
+  const { requests, loading, create, refresh } = useSigningRequests(dealId);
   const [docType, setDocType] = React.useState<DocType>("psa");
   const [signerRole, setSignerRole] = React.useState<SignerRole>("seller");
   const [signerName, setSignerName] = React.useState("");
@@ -147,7 +148,7 @@ export function EsignSection({
       ) : (
         <ul className="grid gap-3">
           {requests.map((r) => (
-            <SigningRow key={r.id} req={r} />
+            <SigningRow key={r.id} req={r} onSigned={refresh} />
           ))}
         </ul>
       )}
@@ -155,12 +156,22 @@ export function EsignSection({
   );
 }
 
-function SigningRow({ req }: { req: SigningRequest }) {
+function SigningRow({
+  req,
+  onSigned,
+}: {
+  req: SigningRequest;
+  onSigned: () => Promise<void>;
+}) {
   const [copied, setCopied] = React.useState(false);
+  const [signing, setSigning] = React.useState(false);
   const url = React.useMemo(() => {
     if (typeof window === "undefined") return `/sign/${req.token}`;
     return `${window.location.origin}/sign/${req.token}`;
   }, [req.token]);
+
+  const canSignInline =
+    req.status === "pending" || req.status === "viewed";
 
   async function copy() {
     try {
@@ -209,7 +220,30 @@ function SigningRow({ req }: { req: SigningRequest }) {
             Open
           </Button>
         </a>
+        {canSignInline && (
+          <Button
+            type="button"
+            variant={signing ? "ghost" : "primary"}
+            size="sm"
+            onClick={() => setSigning((s) => !s)}
+          >
+            {signing ? "Cancel" : "Sign here"}
+          </Button>
+        )}
       </div>
+      {signing && canSignInline && (
+        <div className="rounded-[6px] border border-rule bg-parchment p-4">
+          <SignForm
+            token={req.token}
+            signerName={req.signerName ?? ""}
+            compact
+            onSigned={async () => {
+              setSigning(false);
+              await onSigned();
+            }}
+          />
+        </div>
+      )}
       <div className="text-[11px] text-ink-faint font-mono uppercase tracking-[0.12em] flex items-center gap-3 flex-wrap">
         <span>Created {new Date(req.createdAt).toLocaleDateString()}</span>
         {req.viewedAt && (
