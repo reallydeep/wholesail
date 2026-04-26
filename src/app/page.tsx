@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { HeroReveal } from "./_components/hero-reveal";
+import { PricingReveal } from "./_components/pricing-reveal";
 
 const NAV = [
   { label: "Home", href: "/", active: true },
@@ -71,75 +73,7 @@ export default function CinematicHero() {
           </Link>
         </nav>
 
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-24 pb-48 sm:pt-32">
-          <h1
-            className="animate-fade-rise text-5xl sm:text-7xl md:text-8xl leading-[0.95] max-w-7xl font-normal text-white"
-            style={{
-              fontFamily: "'Instrument Serif', serif",
-              letterSpacing: "-2.46px",
-            }}
-          >
-            Where{" "}
-            <em className="not-italic text-muted-fg">dealmakers</em> rise{" "}
-            <em className="not-italic text-muted-fg">through the noise.</em>
-          </h1>
-
-          <p className="animate-fade-rise-delay text-muted-fg text-base sm:text-lg max-w-2xl mt-8 leading-relaxed">
-            Wholesail is a workshop for sharp investors, careful operators, and
-            quiet closers. Underwrite the math, generate the paper, hand it to
-            your attorney &mdash; every deal, every state, every time.
-          </p>
-
-          <Link
-            href="/signup"
-            className="animate-fade-rise-delay-2 liquid-glass rounded-full px-14 py-5 text-base text-white mt-12 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
-          >
-            Begin Journey
-          </Link>
-
-          <div className="animate-fade-rise-delay-3 mt-10 flex items-center gap-5 text-xs text-muted-fg uppercase tracking-[0.24em]">
-            <span>Free during beta</span>
-            <span aria-hidden className="h-3 w-px bg-white/20" />
-            <span>15 states</span>
-            <span aria-hidden className="h-3 w-px bg-white/20" />
-            <span>No card required</span>
-          </div>
-        </div>
-
-        {/* scroll indicator — drop into pricing below */}
-        <Link
-          href="#pricing"
-          aria-label="Scroll to pricing"
-          className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 text-white/50 hover:text-white transition-colors"
-        >
-          <svg
-            width="22"
-            height="32"
-            viewBox="0 0 22 32"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.2"
-            aria-hidden
-          >
-            <rect x="1" y="1" width="20" height="30" rx="10" />
-            <circle cx="11" cy="10" r="1.5" fill="currentColor">
-              <animate
-                attributeName="cy"
-                from="10"
-                to="22"
-                dur="1.8s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                from="1"
-                to="0"
-                dur="1.8s"
-                repeatCount="indefinite"
-              />
-            </circle>
-          </svg>
-        </Link>
+        <HeroReveal />
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
@@ -176,11 +110,11 @@ export default function CinematicHero() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5 md:gap-4">
+          <PricingReveal>
             {TIERS.map((t) => (
               <TierCard key={t.name} tier={t} />
             ))}
-          </div>
+          </PricingReveal>
 
           <p className="text-center text-xs text-white/30 mt-14">
             Taxes calculated at checkout where applicable. Wholesail is a

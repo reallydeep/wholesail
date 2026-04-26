@@ -2,6 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { Container, SectionLabel } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +20,8 @@ import { renderDocument } from "@/lib/templates/render";
 import type { DocumentVariables } from "@/lib/templates/types";
 import { SUPPORTED_STATES } from "@/lib/compliance";
 import { cn } from "@/lib/utils";
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const DOC_TYPES: DocType[] = ["offer-letter", "psa", "assignment"];
 
@@ -103,21 +108,74 @@ export default function LibraryPage() {
 
   const loading = loadingDeals || loadingReqs;
 
+  const root = React.useRef<HTMLDivElement>(null);
+  const headerRef = React.useRef<HTMLElement>(null);
+  const gridRef = React.useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (headerRef.current && !reduce) {
+        gsap.from(
+          headerRef.current.querySelectorAll<HTMLElement>("[data-anim]"),
+          {
+            y: 18,
+            autoAlpha: 0,
+            duration: 0.7,
+            ease: "expo.out",
+            stagger: 0.08,
+          },
+        );
+      }
+
+      if (!gridRef.current || reduce) return;
+      const rows = Array.from(
+        gridRef.current.querySelectorAll<HTMLElement>("[data-row]"),
+      );
+      if (rows.length === 0) return;
+      gsap.set(rows, { y: 32, autoAlpha: 0 });
+      ScrollTrigger.batch(rows, {
+        start: "top 92%",
+        once: true,
+        onEnter: (els) =>
+          gsap.to(els, {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.7,
+            ease: "expo.out",
+            stagger: 0.08,
+            overwrite: true,
+          }),
+      });
+    },
+    { scope: root, dependencies: [filtered.length, loading] },
+  );
+
   return (
-    <div className="py-10 sm:py-14">
+    <div ref={root} className="py-10 sm:py-14">
       <Container>
-        <header className="grid md:grid-cols-[1fr_auto] gap-6 items-end mb-10">
+        <header
+          ref={headerRef}
+          className="grid md:grid-cols-[1fr_auto] gap-6 items-end mb-10"
+        >
           <div>
-            <SectionLabel>Documents · Library</SectionLabel>
-            <h1 className="font-display text-4xl sm:text-5xl text-ink mt-2 leading-[1.05] tracking-tight">
+            <SectionLabel data-anim>Documents · Library</SectionLabel>
+            <h1
+              data-anim
+              className="font-display text-4xl sm:text-5xl text-ink mt-2 leading-[1.05] tracking-tight"
+            >
               Every doc on the desk.
             </h1>
-            <p className="text-ink-soft mt-3 max-w-xl text-sm leading-relaxed">
+            <p
+              data-anim
+              className="text-ink-soft mt-3 max-w-xl text-sm leading-relaxed"
+            >
               Cross-deal view of starter templates and e-signature status.
               Click any deal to open its Documents tab and send for signature.
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2" data-anim>
             <Stat label="Drafts" value={totals.drafts} />
             <Stat label="Sent" value={totals.sent} />
             <Stat label="Signed" value={totals.signed} tone="forest" />
@@ -152,7 +210,7 @@ export default function LibraryPage() {
         ) : filtered.length === 0 ? (
           <EmptyState all={rows.length === 0} />
         ) : (
-          <div className="grid gap-3">
+          <div ref={gridRef} className="grid gap-3">
             {filtered.map((r) => (
               <LibraryRow key={r.deal.id} row={r} />
             ))}
@@ -172,6 +230,7 @@ function LibraryRow({ row }: { row: DealDocsRow }) {
 
   return (
     <Link
+      data-row
       href={`/app/deals/${deal.id}`}
       className="block rounded-[10px] border border-rule bg-parchment hover:border-forest-200 transition-colors p-5"
     >
