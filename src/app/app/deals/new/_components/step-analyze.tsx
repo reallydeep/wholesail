@@ -51,12 +51,16 @@ export function StepAnalyze({
   const runKey = `${snapshot?.address ?? ""}|${snapshot?.askingPriceCents ?? ""}|${snapshot?.arvCents ?? ""}`;
 
   React.useEffect(() => {
+    // Each deterministic stage holds for ~900ms so the eye can read the
+    // label + hint before the next row lights up. Final AI stage waits
+    // on the real network call.
+    const STAGE_MS = 900;
     const timers: ReturnType<typeof setTimeout>[] = [];
     timers.push(setTimeout(() => setActiveIdx(0), 0));
     for (let i = 1; i <= 3; i++) {
-      timers.push(setTimeout(() => setActiveIdx(i), 400 * i));
+      timers.push(setTimeout(() => setActiveIdx(i), STAGE_MS * i));
     }
-    timers.push(setTimeout(() => setActiveIdx(4), 1600));
+    timers.push(setTimeout(() => setActiveIdx(4), STAGE_MS * 4));
     return () => timers.forEach(clearTimeout);
   }, [runKey]);
 
@@ -244,7 +248,8 @@ function StageRow({ stage, state }: { stage: Stage; state: StageState }) {
   return (
     <li
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-[6px] border transition-colors",
+        "flex items-center gap-3 px-3 py-2.5 rounded-[6px] border",
+        "transition-[background-color,border-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
         state === "done" && "border-forest-200 bg-forest-50",
         state === "active" && "border-brass-100 bg-brass-50",
         state === "pending" && "border-rule bg-parchment",
