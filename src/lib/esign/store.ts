@@ -267,3 +267,76 @@ export async function fetchByTokenLocal(
   const found = lsRead().find((r) => r.token === token);
   return found ?? null;
 }
+
+// ── Firm-wide hook (used by the Documents library) ────────────────
+
+export interface FirmSigningRequestsApi {
+  requests: SigningRequest[];
+  loading: boolean;
+}
+
+export function useFirmSigningRequests(): FirmSigningRequestsApi {
+  return useSupabase
+    ? useFirmSigningRequestsSupabase()
+    : useFirmSigningRequestsLocal();
+}
+
+function useFirmSigningRequestsSupabase(): FirmSigningRequestsApi {
+  const [requests, setRequests] = React.useState<SigningRequest[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    let sb: ReturnType<typeof supabaseBrowser>;
+    try {
+      sb = supabaseBrowser();
+    } catch {
+      setLoading(false);
+      return;
+    }
+    async function load() {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user || cancelled) {
+        setLoading(false);
+        return;
+      }
+      const { data: membership } = await sb
+        .from("memberships")
+        .select("firm_id")
+        .eq("user_id", user.id)
+        .maybeSingle<{ firm_id: string }>();
+      if (cancelled) return;
+      if (!membership) {
+        setLoading(false);
+        return;
+      }
+      const { data: rows } = await sb
+        .from("signing_requests")
+        .select("*")
+        .eq("firm_id", membership.firm_id)
+        .order("created_at", { ascending: false });
+      if (cancelled) return;
+      setRequests(((rows ?? []) as SigningRequestRow[]).map(fromRow));
+      setLoading(false);
+    }
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return { requests, loading };
+}
+
+function useFirmSigningRequestsLocal(): FirmSigningRequestsApi {
+  const raw = React.useSyncExternalStore(lsSubscribe, lsSnapshot, () => "[]");
+  const requests = React.useMemo<SigningRequest[]>(() => {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }, [raw]);
+  return { requests, loading: false };
+}
