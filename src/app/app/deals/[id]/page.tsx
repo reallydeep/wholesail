@@ -18,6 +18,7 @@ import { AiInspectionSection } from "./_components/ai-inspection-section";
 import { DisclosureModal } from "./_components/disclosure-modal";
 import { FlCooldownBanner } from "./_components/fl-cooldown-banner";
 import { DealMap } from "./_components/deal-map";
+import { EsignSection } from "./_components/esign-section";
 import {
   requiresContractDisclosure,
   flCooldownExpiresAt,
@@ -509,6 +510,8 @@ function DocumentsTab({ deal }: { deal: SavedDeal }) {
   return (
     <div className="grid gap-6">
       <AiDocsSection deal={deal} />
+
+      <EsignSection dealId={deal.id} />
 
       <div className="grid gap-4">
         <div className="text-[10px] uppercase tracking-[0.18em] text-brass-700 font-mono font-medium">
